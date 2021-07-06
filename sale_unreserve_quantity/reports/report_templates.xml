@@ -1,0 +1,27 @@
+
+<odoo>
+
+    <template id="sale_report_template_inherit" inherit_id="sale.report_saleorder_document">
+        <xpath expr="//div[1]/div[2]" position="inside">
+            <strong>Expiry Date:</strong><br/><span t-field="doc.expiry_date"/><br/>
+            <strong>Remain Days:</strong><br/><span t-field="doc.rem_days"/>
+        </xpath>
+    </template>
+
+    <template id="delivery_report_template_inherit" inherit_id="stock.report_delivery_document">
+        <xpath expr="//div[1]/div[@name='div_sched_date']" position="after">
+            <strong>Expiry Date:</strong><br/><span t-field="o.expiry_date"/><br/>
+            <strong>Remain Days:</strong><br/><span t-field="o.rem_days"/>
+        </xpath>
+    </template>
+
+    <template id="invoice_report_template_inherit" inherit_id="account.report_invoice_document">
+        <xpath expr="//div[1]/div[@name='reference']" position="after">
+            <div name="expiry_and_days">
+                <strong>Expiry Date:</strong><br/><span t-field="o.expiry_date"/><br/>
+                <strong>Remain Days:</strong><br/><span t-field="o.rem_days"/>
+            </div>
+        </xpath>
+    </template>
+
+</odoo>

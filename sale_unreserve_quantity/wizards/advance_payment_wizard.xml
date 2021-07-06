@@ -1,0 +1,30 @@
+<odoo>
+
+	<record id="advance_payments_wizard_form_view" model="ir.ui.view">
+		<field name="name">Advance Payments</field>
+		<field name="model">advance.payments</field>
+		<field name="arch" type="xml">
+			<form >
+				<group>
+					<group>
+						<field name="amount"/>
+						<field name="journal_id" required="1"/>
+						<field name="rec_bank_account"/>
+						<field name="memo"/>
+					</group>
+					<group>
+						<field name="order_amount" readonly="1"/>
+						<field name="user_id" readonly="1"/>
+						<field name="ref" readonly="1"/>
+						<field name="payment_date" readonly="1"/>
+					</group>
+				</group>
+				<footer>
+					<button name="create_data" string="Apply" type="object" class="btn-primary"/>
+					<button string="Cancel" type="object" class="btn-secondary" special="cancel"/>
+				</footer>
+			</form>
+		</field>
+	</record>
+
+</odoo>
