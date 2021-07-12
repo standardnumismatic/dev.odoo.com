@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_lc_tt,lc.tt,model_lc_tt,base.group_user,1,1,1,1
+access_lc_tt_name,lc.tt.name,model_lc_tt_name,base.group_user,1,1,1,1
+access_lc_condition,lc.condition,model_lc_condition,base.group_user,1,1,1,1

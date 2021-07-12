@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>    
+            <record id="purchase_order_form_inherit" model="ir.ui.view">
+                <field name="name">purchase.order.form122</field>
+                <field name="model">purchase.order</field>
+                <field name="inherit_id" ref="purchase.purchase_order_form"/>
+                <field name="arch" type="xml">
+                    <xpath expr="//header" position="inside">
+                        <button name="compute"  attrs="{'invisible':[('s_for','!=','import')]}" string="Compute" type="object"  class="oe_highlight"/>
+                    </xpath>
+                    <xpath expr="//field[@name='date_order']" position="after">
+                         <field name="s_for"/>
+                         <field name="lc_account" attrs="{'invisible':[('s_for','=','local')],'required':[('s_for','=','import')]}"/>
+                         <field name="is_lc" attrs="{'invisible':['|',('s_for','=','local'),('is_tt','=',True)],'required':[('s_for','=','import')]}"/>
+                         <field name="is_tt" attrs="{'invisible':['|',('s_for','=','local'),('is_lc','=',True)],'required':[('s_for','=','import')]}"/>
+                         <field name="lc_ref" readonly="1" attrs="{'invisible':['|',('s_for','=','local'),('is_tt','=',True)]}"/>
+                         <field name="tt_ref" readonly="1" attrs="{'invisible':['|',('s_for','=','local'),('is_lc','=',True)]}"/>
+                    </xpath>
+                    
+                    <xpath expr="//field[@name='currency_id']" position="after">
+                        <field name="fx_rate" attrs="{'invisible':[('s_for','!=','import')],'required':[('s_for','=','import')]}"/>
+                        <field name="lc_ref_no"  attrs="{'invisible':[('s_for','!=','import')]}"/>
+                        <field name="bank_name" attrs="{'invisible':[('s_for','!=','import')]}"/>
+                        <field name="condition" attrs="{'invisible':[('s_for','!=','import')]}"/>
+                    </xpath>
+                    
+                    <xpath expr="//form/sheet/notebook/page/field[@name='order_line']/tree/field[@name='price_unit']" position="before">
+                        
+                        <field name="s_for" invisible="1"/>                    
+                        <field name="unit_pricefc" attrs="{'invisible':[('s_for','=','local')]}"/>
+                        <field name="sub_total_fc" attrs="{'invisible':[('s_for','=','local')]}"/>
+                        <field name="sub_total_lp" attrs="{'invisible':[('s_for','=','local')]}"/>
+                        <field name="lc_cost" attrs="{'invisible':[('s_for','=','local')]}"/>
+                    </xpath>
+                    
+                    <xpath expr="//notebook" position="inside">
+                        <page string="LC And TT" attrs="{'invisible':[('s_for','!=','import')]}">
+                            <field name="lc_ids">
+                                <tree editable="bottom" create="false" delete="false">
+                                    <field name="name"/>
+                                    <field name="amount"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </xpath>
+                </field>
+            </record>
+            
+        <!-- Journal Entery View -->
+        <record id="view_move_form_inherit" model="ir.ui.view">
+                <field name="name">account.move.form</field>
+                <field name="model">account.move</field>
+                <field name="inherit_id" ref="account.view_move_form"/>
+                <field name="arch" type="xml">
+                    <xpath expr="//field[@name='ref']" position="after">
+
+                        <field name="lc_ref_po" attrs="{'invisible':[('is_lc_jour_entr','=',False),('is_tt_jour_entr','=',False)],'required':['|',('is_lc_jour_entr','=',True),('is_tt_jour_entr','=',True)]}"/>
+                        <field name="lc_ref" attrs="{'invisible':[('is_lc_jour_entr','=',False)]}" readonly="1"/>
+                        <field name="tt_ref" attrs="{'invisible':[('is_tt_jour_entr','=',False)]}" readonly="1"/>
+                        <field name="is_lc_jour_entr" invisible="1"/>
+                        <field name="is_tt_jour_entr" invisible="1"/>
+                        
+                    </xpath>
+                    
+                    <xpath expr="//form/sheet/notebook/page/field[@name='line_ids']/tree/field[@name='debit']" position="before">
+                     <!-- attrs="{'invisible':[('move_id.lc_ref_po','=',False)],'required':[('move_id.lc_ref_po','=',True)]}" -->
+                        <field name="is_lc_jour_entr" invisible="1"/>
+                        <field name="is_tt_jour_entr" invisible="1"/>
+                        <field name="lc_charges" attrs="{'invisible':[('is_lc_jour_entr','=',False),('is_tt_jour_entr','=',False)]}"/>
+                    </xpath>
+                </field>
+            </record>
+            
+            
+            
+        <record id="view_account_journal_form_inherit" model="ir.ui.view">
+                <field name="name">account.journal.form</field>
+                <field name="model">account.journal</field>
+                <field name="inherit_id" ref="account.view_account_journal_form"/>
+                <field name="arch" type="xml">
+                    <xpath expr="//field[@name='type']" position="after">
+                        <field name="is_lc_jour"/>
+                        <field name="is_tt_jour"/>
+                    </xpath>
+                </field>
+        </record>
+        
+        
+        
+        
+        <!-- Lc Form View -->
+        <record id="lc_tt_form" model="ir.ui.view">
+                <field name="name">lc.tt.form</field>
+                <field name="model">lc.tt</field>
+                <field name="arch" type="xml">
+                    <form string="LC">
+                         <field name="name"/>
+                         <field name="amount" readonly="True"/>
+                    </form>
+                </field>
+        </record>
+        
+        <record id="lc_tt_name_form" model="ir.ui.view">
+                <field name="name">lc.tt.name.form</field>
+                <field name="model">lc.tt.name</field>
+                <field name="arch" type="xml">
+                    <form string="LC TT Name">
+                         <field name="name"/>
+                    </form>
+                </field>
+        </record>
+            
+    </data>
+</odoo>
