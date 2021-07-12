@@ -1,0 +1,75 @@
+<odoo>
+
+    <record id="view_stock_location_form_inherit" model="ir.ui.view">
+        <field name="name">stock.location.form.inherit</field>
+        <field name="model">stock.location</field>
+        <field name="inherit_id" ref="stock.view_location_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='removal_strategy_id']" position="after">
+                 <field name="off_site_vaults"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_stock_picking_form_inherit" model="ir.ui.view">
+        <field name="name">stock.picking.form.inherit</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//header/button[@name='action_confirm']" position="after">
+                <button name="ceo_button_approved"
+                        type="object"
+                        string="Approve"
+                        class="oe_highlight"
+                        attrs="{'invisible': [('state', '!=', 'ceo_approve')]}"
+                        groups="off_site_vaults.group_ceo_approval"/>
+            </xpath>
+
+            <xpath expr="//header/button[@name='action_confirm']" position="after">
+                <button name="cfo_button_approved"
+                        type="object"
+                        string="Approve"
+                        class="oe_highlight"
+                        attrs="{'invisible': [('state', '!=', 'cfo_approve')]}"
+                        groups="off_site_vaults.group_cfo_approval"/>
+            </xpath>
+
+            <xpath expr="//header//button[@name='action_assign']" position="after">
+                <button name="cfo_button_reject"
+                        type="object"
+                        string="Reject"
+                        class="oe_highlight"
+                        attrs="{'invisible': [('state', 'not in', ['cfo_approve'])]}"
+                        groups="off_site_vaults.group_cfo_approval"/>
+            </xpath>
+
+            <xpath expr="//header//button[@name='action_assign']" position="after">
+                <button name="ceo_button_reject"
+                        type="object"
+                        string="Reject"
+                        class="oe_highlight"
+                        attrs="{'invisible': [('state', 'not in', ['ceo_approve'])]}"
+                        groups="off_site_vaults.group_ceo_approval"/>
+            </xpath>
+
+            <xpath expr="//header//button[@name='button_validate']" position="replace">
+                <button name="button_validated"
+                        type="object"
+                        string="Validate"
+                        class="oe_highlight"
+                        attrs="{'invisible': [('state', '!=', 'assigned')]}"/>
+            </xpath>
+
+            <xpath expr="//header/button[@name='action_toggle_is_locked']" position="attributes">
+                <attribute name="attrs">{'invisible': ['|', ('state', 'in', ('draft', 'ceo_approve', 'cfo_approve', 'rejected', 'cancel')), ('is_locked', '=', False)]}</attribute>
+            </xpath>
+
+            <xpath expr="//header/button[@name='button_scrap']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+        </field>
+    </record>
+
+</odoo>
