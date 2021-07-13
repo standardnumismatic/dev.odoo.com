@@ -95,12 +95,19 @@ class StockPickingInhs(models.Model):
         default=lambda self: self.env['stock.picking.type'].browse(self._context.get('default_picking_type_id')).default_location_src_id,
         check_company=True, required=True)
 # states={'draft,confirmed': [('readonly', False)]}
+
     warehouse_domain_id = fields.Many2many('stock.location', compute='onchange_get_locations')
 
-
+    @api.depends('location_id')
     def onchange_get_locations(self):
-        locations = self.env['stock.location'].search([('location_id', '=', self.sale_id.warehouse_id.code)])
-        self.warehouse_domain_id = locations.ids
+        if self.origin:
+            print('if')
+            locations = self.env['stock.location'].search([('location_id', '=', self.sale_id.warehouse_id.code)])
+            self.warehouse_domain_id = locations.ids
+        else:
+            print('else')
+            locations = self.env['stock.location'].search([])
+            self.warehouse_domain_id = locations.ids
 
     def compute_show_validate(self):
         if self.picking_type_id.sequence_code in ['OUT', 'PICK', 'PACK']:
