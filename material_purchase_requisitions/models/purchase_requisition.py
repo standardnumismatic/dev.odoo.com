@@ -175,16 +175,16 @@ class MaterialPurchaseRequisition(models.Model):
         string='Purchase Ordes',
     )
 
-    def default_custom_picking_type_id(self):
-        picking = self.env['stock.picking.type'].search([('code', '=', 'internal')])
-        print(picking.name)
-        return picking.id
+    custom_picking_type_ids = fields.Many2many(
+        'stock.picking.type',
+        string='Picking Types',
+        copy=False,
+        compute='compute_custom_picking_type_ids'
+    )
 
     custom_picking_type_id = fields.Many2one(
         'stock.picking.type',
         string='Picking Type',
-        copy=False,
-        default=default_custom_picking_type_id
     )
 
     is_po_int_done = fields.Boolean(
@@ -193,13 +193,16 @@ class MaterialPurchaseRequisition(models.Model):
         compute='compute_is_po_int_done'
     )
 
+    @api.depends('custom_picking_type_id')
+    def compute_custom_picking_type_ids(self):
+        picking = self.env['stock.picking.type'].search([('code', '=', 'internal')])
+        self.custom_picking_type_ids = picking.ids
+
     def compute_is_po_int_done(self):
         flag = True
         if self.env.user.has_group('material_purchase_requisitions.group_requisition_user'):
             purchase_record = self.env['purchase.order'].search([('custom_requisition_id', '=', self.id)])
             picking_record = self.env['stock.picking'].search([('custom_requisition_id', '=', self.id)])
-            print('Purchase Record', purchase_record)
-            print('Picking Record', picking_record)
             for purchase_rec in purchase_record:
                 if purchase_rec.state != 'purchase':
                     flag = False

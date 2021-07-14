@@ -76,7 +76,9 @@
                                     <group>
                                         <field name="dest_location_id" groups="material_purchase_requisitions.group_requisition_line_manager,stock.group_stock_user" attrs="{'readonly': [['state', 'in', ['stock','reject','cancel','receive']]]}"/>
                                         <field name="delivery_picking_id" groups="material_purchase_requisitions.group_requisition_line_manager,stock.group_stock_user"/>
-                                        <field name="custom_picking_type_id" groups="material_purchase_requisitions.group_requisition_line_manager,stock.group_stock_user" attrs="{'readonly': [['state', 'in', ['stock','reject','cancel','receive']]]}"/>
+                                        <field name="custom_picking_type_id" groups="material_purchase_requisitions.group_requisition_line_manager,stock.group_stock_user" attrs="{'readonly': [['state', 'in', ['stock','reject','cancel','receive']]]}" domain="[('id', 'in', custom_picking_type_ids)]"/>
+
+                                        <field name="custom_picking_type_ids" widget="many2many_tags" invisible="1"/>
                                     </group>
                                 </group>
                             </page>
