@@ -17,6 +17,10 @@
         <field name="inherit_id" ref="stock.view_picking_form"/>
         <field name="arch" type="xml">
 
+<!--            <xpath expr="//header/field[@name='state']" position="replace">-->
+<!--                <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,assigned,ceo_approve,done" />-->
+<!--            </xpath>-->
+
             <xpath expr="//header/button[@name='action_confirm']" position="after">
                 <button name="ceo_button_approved"
                         type="object"
@@ -24,24 +28,6 @@
                         class="oe_highlight"
                         attrs="{'invisible': [('state', '!=', 'ceo_approve')]}"
                         groups="off_site_vaults.group_ceo_approval"/>
-            </xpath>
-
-            <xpath expr="//header/button[@name='action_confirm']" position="after">
-                <button name="cfo_button_approved"
-                        type="object"
-                        string="Approve"
-                        class="oe_highlight"
-                        attrs="{'invisible': [('state', '!=', 'cfo_approve')]}"
-                        groups="off_site_vaults.group_cfo_approval"/>
-            </xpath>
-
-            <xpath expr="//header//button[@name='action_assign']" position="after">
-                <button name="cfo_button_reject"
-                        type="object"
-                        string="Reject"
-                        class="oe_highlight"
-                        attrs="{'invisible': [('state', 'not in', ['cfo_approve'])]}"
-                        groups="off_site_vaults.group_cfo_approval"/>
             </xpath>
 
             <xpath expr="//header//button[@name='action_assign']" position="after">
@@ -62,7 +48,7 @@
             </xpath>
 
             <xpath expr="//header/button[@name='action_toggle_is_locked']" position="attributes">
-                <attribute name="attrs">{'invisible': ['|', ('state', 'in', ('draft', 'ceo_approve', 'cfo_approve', 'rejected', 'cancel')), ('is_locked', '=', False)]}</attribute>
+                <attribute name="attrs">{'invisible': ['|', ('state', 'in', ('draft', 'ceo_approve', 'rejected', 'cancel')), ('is_locked', '=', False)]}</attribute>
             </xpath>
 
             <xpath expr="//header/button[@name='button_scrap']" position="attributes">

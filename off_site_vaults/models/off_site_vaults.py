@@ -26,8 +26,7 @@ class StockPickingInherit(models.Model):
         ('waiting', 'Waiting Another Operation'),
         ('confirmed', 'Waiting'),
         ('assigned', 'Ready'),
-        ('cfo_approve', 'Waiting For CFO Approval'),
-        ('ceo_approve', 'Waiting For CEO Approval'),
+        ('ceo_approve', 'Waiting For Approval'),
         ('done', 'Done'),
         ('cancel', 'Cancelled'),
         ('rejected', 'Rejected'),
@@ -45,7 +44,7 @@ class StockPickingInherit(models.Model):
         if self.location_id.off_site_vaults == True or self.location_dest_id.off_site_vaults == True:
             if self.picking_type_id.code in ['internal', 'incoming', 'outgoing']:
                 self.write({
-                    'state': 'cfo_approve'
+                    'state': 'ceo_approve'
                 })
             else:
                 res = super(StockPickingInherit, self).button_validate()
@@ -54,19 +53,9 @@ class StockPickingInherit(models.Model):
             res = super(StockPickingInherit, self).button_validate()
             return res
 
-    def cfo_button_approved(self):
-        self.write({
-            'state': 'ceo_approve'
-        })
-
     def ceo_button_approved(self):
         res = super(StockPickingInherit, self).button_validate()
         return res
-
-    def cfo_button_reject(self):
-        self.write({
-            'state': 'rejected'
-        })
 
     def ceo_button_reject(self):
         self.write({

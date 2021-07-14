@@ -7,13 +7,13 @@
 	</record>
 
 	<record id="group_ceo_approval" model="res.groups">
-		<field name="name">CEO</field>
+		<field name="name">CEO Approval</field>
 		<field name="category_id" ref="main_stock_approval_category"/>
 	</record>
 
-	<record id="group_cfo_approval" model="res.groups">
-		<field name="name">CFO</field>
-		<field name="category_id" ref="main_stock_approval_category"/>
-	</record>
+<!--	<record id="group_cfo_approval" model="res.groups">-->
+<!--		<field name="name">CFO</field>-->
+<!--		<field name="category_id" ref="main_stock_approval_category"/>-->
+<!--	</record>-->
 
 </odoo>
