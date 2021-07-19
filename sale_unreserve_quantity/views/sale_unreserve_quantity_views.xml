@@ -11,13 +11,28 @@
         <field name="interval_type">days</field>
         <field name="numbercall">-1</field>
     </record>
+    
+     <record id="view_sale_stock_order_inherit" model="ir.ui.view">
+        <field name="name">sale.order.inherit.stock</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale_stock.view_order_form_inherit_sale_stock"/>
+        <field name="arch" type="xml"> 
+            <xpath expr="//field[@name='warehouse_id']" position="replace">
+            </xpath>
+        </field>
+    </record>    
 
     <record id="view_sale_order_inherit" model="ir.ui.view">
         <field name="name">sale.order.inherit</field>
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
-
+              
+             <xpath expr="//field[@name='payment_term_id']" position="after">
+                 <field name="warehouse_id" options="{'no_create': True}" groups="stock.group_stock_multi_warehouses" force_save="1"/>
+            </xpath>  
+              
+              
             <xpath expr="//button[@name='action_draft']" position="after">
                 <button string="Register Payment" type="object" name="action_register_payments" class="oe_highlight" attrs="{'invisible': ['|', ('state', '!=', 'sale'), ('is_show_payment', '!=', False)]}"/>
             </xpath>
@@ -27,7 +42,7 @@
                 </button>
             </xpath>
             <xpath expr="//header/button[4]" position="attributes">
-                <attribute name="invisible">1</attribute>
+                <attribute name="invisible">0</attribute>
             </xpath>
 
             <xpath expr="//field[@name='order_line']" position="attributes">

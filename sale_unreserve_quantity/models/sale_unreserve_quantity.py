@@ -42,7 +42,7 @@ class SaleOrderInherites(models.Model):
             'type': 'ir.actions.act_window',
             'name': 'Register Payments',
             'view_id': self.env.ref('sale_unreserve_quantity.advance_payments_wizard_form_view', False).id,
-            'context': {'default_ref': self.name, 'default_order_amount': self.amount_total, 'default_user_id': self.user_id.id},
+            'context': {'default_ref': self.name, 'default_order_amount': self.amount_total, 'default_user_id': self.user_id.id, 'default_amount': self.amount_total},
             'target': 'new',
             'res_model': 'advance.payments',
             'view_mode': 'form',
@@ -133,6 +133,8 @@ class AccountMoveInhs(models.Model):
             if sale_record:
                 if sale_record.payment_count != False:
                     record.is_check_payment_registered = True
+                else:
+                    record.is_check_payment_registered = False    
             else:
                 record.is_check_payment_registered = True
 

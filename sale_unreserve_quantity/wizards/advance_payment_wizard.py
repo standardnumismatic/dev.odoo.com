@@ -20,7 +20,10 @@ class AdvancePayments(models.TransientModel):
         return journal.id
 
     journal_id = fields.Many2one('account.journal', default=default_journal_id)
-
+    
+    
+    
+    
     def create_data(self):
         model = self.env.context.get('active_model')
         record = self.env[model].browse(self.env.context.get('active_id'))
@@ -41,3 +44,96 @@ class AdvancePayments(models.TransientModel):
             payment = self.env['account.payment'].create(vals)
             payment.action_post()
             record.is_show_payment = True
+#             commission = record.user_id.commission_price
+            if record.commission_for and record.commission_for.commission_price: 
+                commission=record.commission_for.commission_price
+            if record.referred_by:
+                independent_partner = record.referred_by
+                self.create_journal_entry(record , commission ,independent_partner)
+                
+            else: 
+                self.create_journal_entry(record , commission)
+                
+                
+            
+    def create_journal_entry(self , rec , commission , inde_part = False):
+        
+              
+        move_lines=[]
+        credit_amount =0.0
+        commission_debit_account = self.env['account.account'].search([('name','=','Commission expense')])
+        commission_credit_account = self.env['account.account'].search([('name','=','Commission payable')])
+        misc_journal = self.env['account.journal'].search([('type','=','general')],limit=1)
+        
+        journal_entry_dict ={
+                            'journal_id': misc_journal.id,
+                            'move_type': 'entry',
+                            'date': self.payment_date,
+                            'ref':rec.name,
+                            'state':'draft'
+                     }
+        for line in rec.order_line:
+            if not inde_part:
+                debit = (line.price_subtotal * commission)/100
+                
+            else:
+                subtotal = line.comm_extra_price * line.product_uom_qty  
+                debit = (subtotal * commission )/100
+                
+                 
+            credit_amount = credit_amount + debit
+            debit_line = (0, 0 ,{
+                'account_id': commission_debit_account.id,
+                'partner_id':rec.partner_id.id,
+                'debit':debit,
+                'credit': 0.0,
+                })
+        
+            move_lines.append(debit_line)
+            
+        credit_line = (0, 0 ,{
+                'account_id': commission_credit_account.id,
+                'partner_id':rec.partner_id.id,
+                'debit':0.0,
+                'credit': credit_amount,
+                })
+         
+        move_lines.append(credit_line)
+        journal_entry_dict['line_ids'] = move_lines
+        journal_entry_id = self.env['account.move'].create(journal_entry_dict)
+        journal_entry_id.action_post()
+        #extra journal entry (extra price  - unit price)based on string
+        if inde_part:
+            ip_move_lines=[]
+            ip_credit_amount= 0.0
+            ip_je_dict = {
+                        'journal_id': misc_journal.id,
+                        'move_type': 'entry',
+                        'date': self.payment_date,
+                        'ref':rec.name,
+                        'state':'draft'
+                    }
+            
+            for line in rec.order_line:
+                debit = (line.price_unit - line.comm_extra_price) * line.product_uom_qty
+                ip_credit_amount = ip_credit_amount + debit
+                ip_debit_line = (0, 0 ,{
+                'account_id': commission_debit_account.id,
+                'partner_id':rec.referred_by.id,
+                'debit':debit,
+                'credit': 0.0,
+                })
+                ip_move_lines.append(ip_debit_line)
+            
+            ip_credit_line = (0, 0 ,{
+                'account_id': commission_credit_account.id,
+                'partner_id':rec.referred_by.id,
+                'debit':0.0,
+                'credit': ip_credit_amount,
+                })
+            
+            ip_move_lines.append(ip_credit_line)
+            
+            ip_je_dict['line_ids'] = ip_move_lines
+            ip_journal_entry_id = self.env['account.move'].create(ip_je_dict)
+            ip_journal_entry_id.action_post() 
