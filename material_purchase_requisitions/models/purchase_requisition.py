@@ -195,7 +195,7 @@ class MaterialPurchaseRequisition(models.Model):
 
     @api.depends('custom_picking_type_id')
     def compute_custom_picking_type_ids(self):
-        picking = self.env['stock.picking.type'].search([('code', '=', 'internal')])
+        picking = self.env['stock.picking.type'].search([('sequence_code', '=', 'INT')])
         self.custom_picking_type_ids = picking.ids
 
     def compute_is_po_int_done(self):
