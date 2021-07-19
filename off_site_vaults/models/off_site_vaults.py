@@ -17,7 +17,7 @@ class StockLocationInherit(models.Model):
     off_site_vaults = fields.Boolean(string='Off Site Vaults', default=False)
 
 
-class StockPickingInherit(models.Model):
+class StockPickingInherites(models.Model):
     _inherit = 'stock.picking'
 
 
@@ -46,14 +46,14 @@ class StockPickingInherit(models.Model):
                     'state': 'ceo_approve'
                 })
             else:
-                res = super(StockPickingInherit, self).button_validate()
+                res = super(StockPickingInherites, self).button_validate()
                 return res
         else:
-            res = super(StockPickingInherit, self).button_validate()
+            res = super(StockPickingInherites, self).button_validate()
             return res
 
     def ceo_button_approved(self):
-        res = super(StockPickingInherit, self).button_validate()
+        res = super(StockPickingInherites, self).button_validate()
         return res
 
     def ceo_button_reject(self):
