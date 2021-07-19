@@ -39,8 +39,7 @@ class StockPickingInherit(models.Model):
              " * Done: The transfer has been processed.\n"
              " * Cancelled: The transfer has been cancelled.")
 
-
-    def button_validated(self):
+    def button_validate(self):
         if self.location_id.off_site_vaults == True or self.location_dest_id.off_site_vaults == True:
             if self.picking_type_id.code in ['internal', 'incoming', 'outgoing']:
                 self.write({

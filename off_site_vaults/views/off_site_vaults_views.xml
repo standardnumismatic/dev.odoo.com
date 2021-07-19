@@ -39,19 +39,23 @@
                         groups="off_site_vaults.group_ceo_approval"/>
             </xpath>
 
-            <xpath expr="//header//button[@name='button_validate']" position="replace">
-                <button name="button_validated"
-                        type="object"
-                        string="Validate"
-                        class="oe_highlight"
-                        attrs="{'invisible': [('state', '!=', 'assigned')]}"/>
-            </xpath>
+<!--            <xpath expr="//header//button[@name='button_validate']" position="replace">-->
+<!--                <button name="button_validated"-->
+<!--                        type="object"-->
+<!--                        string="Validate"-->
+<!--                        class="oe_highlight"-->
+<!--                        attrs="{'invisible': [('state', '!=', 'assigned')]}"/>-->
+<!--            </xpath>-->
 
             <xpath expr="//header/button[@name='action_toggle_is_locked']" position="attributes">
-                <attribute name="attrs">{'invisible': ['|', ('state', 'in', ('draft', 'ceo_approve', 'rejected', 'cancel')), ('is_locked', '=', False)]}</attribute>
+                <attribute name="attrs">{'invisible': ['|', ('state', 'in', ('draft', 'assigned','ceo_approve', 'rejected', 'cancel', 'done')), ('is_locked', '=', False)]}</attribute>
             </xpath>
 
             <xpath expr="//header/button[@name='button_scrap']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+            <xpath expr="//header/button[@name='%(stock.act_stock_return_picking)d']" position="attributes">
                 <attribute name="invisible">1</attribute>
             </xpath>
 
