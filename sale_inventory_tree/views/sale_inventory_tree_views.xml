@@ -1,0 +1,76 @@
+<odoo>
+
+    <record id="sale_product_tree_view" model="ir.ui.view">
+        <field name="name">sale.product.tree</field>
+        <field name="model">product.product</field>
+        <field eval="7" name="priority"/>
+        <field name="arch" type="xml">
+            <tree string="Product Variants" multi_edit="1" duplicate="false" sample="1">
+                <field name="name" readonly="1"/>
+                <field name="barcode" readonly="1"/>
+                <field name="product_template_attribute_value_ids" widget="many2many_tags"
+                       groups="product.group_product_variant" readonly="1"/>
+                <field name="lst_price" optional="show" string="Sales Price"/>
+                <field name="input_url" widget="url"
+                        attrs="{'invisible': [('input_url', '=', False)]}"/>
+                <field name="qty_available"/>
+                <field name="virtual_available"/>
+                <field name="product_tmpl_id" invisible="1" readonly="1"/>
+                <field name="active" invisible="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="sale_product_normal_action_sell" model="ir.actions.act_window">
+        <field name="name">Product Variants</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">product.product</field>
+        <field name="view_mode">kanban,tree,form,activity</field>
+        <field name="context">{"search_default_filter_to_sell":1}</field>
+        <field name="view_id" ref="sale_product_tree_view"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new product variant
+            </p>
+            <p>
+                You must define a product for everything you sell, whether it's a physical product,
+                a consumable or a service you offer to customers.
+                The product form contains information to simplify the sale process:
+                price, notes in the quotation, accounting data, procurement methods, etc.
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="menu_sale_inventory_tree"
+              name="Inventory"
+              action="sale_inventory_tree.sale_product_normal_action_sell"
+              parent="sale.menu_sale_report"
+              sequence="15"/>
+
+
+<!--    <record id="sale_product_tree_view" model="ir.ui.view">-->
+<!--        <field name="name">product.product.tree</field>-->
+<!--        <field name="model">product.product</field>-->
+<!--        <field eval="7" name="priority"/>-->
+<!--        <field name="arch" type="xml">-->
+<!--            <tree string="Product Variants" multi_edit="1" duplicate="false" sample="1">-->
+<!--                <field name="default_code" optional="show" readonly="1"/>-->
+<!--                <field name="barcode" optional="hide" readonly="1"/>-->
+<!--                <field name="name" readonly="1"/>-->
+<!--                <field name="product_template_attribute_value_ids" widget="many2many_tags"-->
+<!--                       groups="product.group_product_variant" readonly="1"/>-->
+<!--                <field name="company_id" groups="base.group_multi_company" optional="hide" readonly="1"/>-->
+<!--                <field name="lst_price" optional="show" string="Sales Price"/>-->
+<!--                <field name="standard_price" optional="show"/>-->
+<!--                <field name="categ_id" optional="hide"/>-->
+<!--                <field name="type" optional="hide" readonly="1"/>-->
+<!--                <field name="price" invisible="not context.get('pricelist',False)"/>-->
+<!--                <field name="uom_id" options="{'no_open': True, 'no_create': True}" groups="uom.group_uom"-->
+<!--                       optional="show" readonly="1"/>-->
+<!--                <field name="product_tmpl_id" invisible="1" readonly="1"/>-->
+<!--                <field name="active" invisible="1"/>-->
+<!--            </tree>-->
+<!--        </field>-->
+<!--    </record>-->
+
+</odoo>
