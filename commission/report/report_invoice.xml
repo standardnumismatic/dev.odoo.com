@@ -1,0 +1,12 @@
+<odoo>
+    <data>
+        <template id="invoice_report_commission_inherit" inherit_id="account.report_invoice_document">
+        
+            <xpath expr="//table[1]/thead/tr/th[@name='th_priceunit']/span" position="replace">
+            
+                <span>Extra Price</span>
+                
+            </xpath>
+        </template>
+    </data>
+</odoo>        
