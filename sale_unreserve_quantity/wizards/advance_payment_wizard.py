@@ -70,6 +70,7 @@ class AdvancePayments(models.TransientModel):
                             'move_type': 'entry',
                             'date': self.payment_date,
                             'ref':rec.name,
+                            'commission_partner_id':rec.commission_for.id,
                             'state':'draft'
                      }
         for line in rec.order_line:
@@ -110,6 +111,7 @@ class AdvancePayments(models.TransientModel):
                         'journal_id': misc_journal.id,
                         'move_type': 'entry',
                         'date': self.payment_date,
+#                         'commission_partner_id':rec.commission_for.id,
                         'ref':rec.name,
                         'state':'draft'
                     }
