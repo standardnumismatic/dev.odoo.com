@@ -50,6 +50,10 @@ class PurchaseOrderInherit(models.Model):
 
     incoterm_id = fields.Many2one('account.incoterms', 'Incoterm', states={'done': [('readonly', True)]}, invisible=1, readonly=True, help="International Commercial Terms are a series of predefined commercial terms used in international transactions.")
 
+    warehouse_id = fields.Many2one(
+        'stock.warehouse', string='Warehouse',
+        required=True, readonly=True, states={'draft': [('readonly', False)]}, check_company=True)
+
     def compute_is_receipt_done(self):
         flag = True
         picking_record = self.env['stock.picking'].search([('origin', '=', self.name)])
@@ -170,3 +174,27 @@ class PurchaseOrderInherit(models.Model):
         self.write({
             'state': 'reject'
         })
+
+
+class StockPickingInh(models.Model):
+    _inherit = 'stock.picking'
+
+# states={'draft,confirmed': [('readonly', False)]}
+
+    location_dest_id = fields.Many2one(
+        'stock.location', "Destination Location",
+        default=lambda self: self.env['stock.picking.type'].browse(self._context.get('default_picking_type_id')).default_location_dest_id,
+        check_company=True, required=True, readonly=False,
+        )
+
+# states={'draft': [('readonly', False)]}
+    warehouse_domain_id = fields.Many2many('stock.location', compute='onchange_get_locations')
+
+    @api.depends('location_dest_id')
+    def onchange_get_locations(self):
+        if self.origin:
+            locations = self.env['stock.location'].search([('location_id', '=', self.purchase_id.warehouse_id.code)])
+            self.warehouse_domain_id = locations.ids
+        else:
+            locations = self.env['stock.location'].search([])
+            self.warehouse_domain_id = locations.ids
