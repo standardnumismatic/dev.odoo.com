@@ -104,7 +104,7 @@ class AccountMoveCommissionInh(models.Model):
 
     journal_entry_count = fields.Integer(string = "Journal Entry",compute="get_total_enteries")
     referred_by = fields.Many2one('res.partner',string="Referred by", domain =[('independent_partner','=',True)])
-    invoice_ref = fields .Many2one('account.move', string="invoice ref")
+    invoice_ref = fields .Many2one('account.move', string="Invoice Ref")
     commission_partner_id = fields.Many2one("hr.employee", string="Commission for",required = True)     
 
     def action_post(self):

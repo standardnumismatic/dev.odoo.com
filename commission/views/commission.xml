@@ -40,7 +40,7 @@
 
                 <xpath expr="//field[@name = 'payment_reference']" position="before">
                     <field name="invoice_ref" attrs="{'readonly': [('state', 'in', ('draft','posted','cancel'))] , 'invisible':[('move_type','!=','entry')]}"/>
-                    <field name="commission_partner_id" attrs="{'readonly': [('state', 'in', ('draft','posted','cancel'))] , 'invisible':[('move_type','!=','entry')]}"/>
+                    <field name="commission_partner_id" attrs="{'readonly': [('state', 'in', ('draft','posted','cancel'))] , 'invisible':[('move_type','not in',['entry','out_invoice'])]}"/>
                 </xpath>
 
                 <xpath expr="//div[@name='button_box']" position="inside">
