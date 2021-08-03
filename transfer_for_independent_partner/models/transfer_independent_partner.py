@@ -9,7 +9,6 @@ from datetime import datetime
 from datetime import date
 
 
-
 class StockPickingInhs(models.Model):
     _inherit = 'stock.picking'
 
@@ -71,10 +70,6 @@ class StockPickingInhs(models.Model):
                             # }
                             # stock_move_line_id = self.env['stock.move.line'].create(moves)
 
-
-
-
-
     def action_transfer_independent(self):
         picking_record = self.search([])
         for record in picking_record:
@@ -103,6 +98,7 @@ class StockPickingInhs(models.Model):
                             'picking_type_id': record.picking_type_id.id,
                             'location_id': record.location_dest_id.id,
                             'location_dest_id': record.location_id.id,
+                            'origin': record.name,
                             'move_ids_without_package': line_val,
                         })
                         rec.action_confirm()
