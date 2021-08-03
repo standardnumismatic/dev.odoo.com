@@ -45,7 +45,6 @@ class StockPickingInhe(models.Model):
 
     location_id = fields.Many2one('stock.location', string='Source Locations')
     location_ids = fields.Many2many('stock.location', string='Locations', compute='compute_location_ids')
-    export_in_name = fields.Char(string='Export')
 
     @api.depends('location_id')
     def compute_location_ids(self):
