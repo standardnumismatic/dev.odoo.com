@@ -39,6 +39,25 @@ class PurchaseGradingCompany(models.Model):
         picking = self.env['stock.picking'].search([('picking_type_id.code', '=', 'internal'),('location_id.grading_company_vaults', '=', True)])
         self.reference_in_ids = picking.ids
 
+    def action_create_invoice(self):
+        res = super(PurchaseGradingCompany, self).action_create_invoice()
+        ref_in =[]
+        ref_out =[]
+        for ref_outs in self.reference_out_id:
+            ref_out.append(ref_outs.name)
+        data_out = ','.join(ref_out)
+        for ref_ins in self.reference_in_id:
+            ref_in.append(ref_ins.name)
+        data_in = ','.join(ref_in)
+        bills = self.env['account.move'].search([('invoice_origin', '=', self.name)])
+        print(bills)
+        for bill in bills:
+            bill.write({
+                'reference_out': data_out,
+                'reference_in': data_in,
+            })
+        return res
+
 
 class StockPickingInhe(models.Model):
     _inherit = "stock.picking"
@@ -62,3 +81,10 @@ class StockPickingInhe(models.Model):
                     })
         res = super(StockPickingInhe, self).button_validate()
         return res
+
+
+class AccountMoveInh(models.Model):
+    _inherit = "account.move"
+
+    reference_out = fields.Char(string='Reference Out')
+    reference_in = fields.Char(string='Reference In')
