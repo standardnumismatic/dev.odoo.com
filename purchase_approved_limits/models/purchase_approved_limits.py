@@ -175,6 +175,15 @@ class PurchaseOrderInherit(models.Model):
             'state': 'reject'
         })
 
+    def action_create_invoice(self):
+        res = super(PurchaseOrderInherit, self).action_create_invoice()
+        for invoice in self.invoice_ids:
+            invoice.write({
+                'payment_term_id': self.payment_term_id.id,
+                'carriage_method': self.carriage_method
+            })
+        return res
+
 
 class StockPickingInh(models.Model):
     _inherit = 'stock.picking'
@@ -198,3 +207,19 @@ class StockPickingInh(models.Model):
         else:
             locations = self.env['stock.location'].search([])
             self.warehouse_domain_id = locations.ids
+
+
+class AccountMoveInherit(models.Model):
+    _inherit = 'account.move'
+
+    payment_term_id = fields.Many2one('account.payment.term', string='Payment Terms', domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]")
+
+    carriage_method = fields.Selection([
+        ('by_land', 'By Land'),
+        ('by_sea', 'By Sea'),
+        ('by_air', 'By Air')
+    ], string='Carriage Method')
+
+
+
+
