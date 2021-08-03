@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+
+    <record id="view_purchase_order_form_inherit" model="ir.ui.view">
+        <field name="name">purchase.order.form.inherit</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='origin']" position="after">
+                <field name="reference_out_id" widget="many2many_tags"
+                       attrs="{'readonly': [('state', '=', 'purchase')]}"
+                       domain="[('id', 'in', reference_out_ids)]"
+                       options="{'no_create': True, 'no_create_edit':True}"/>
+            </xpath>
+            <xpath expr="//field[@name='reference_out_id']" position="after">
+                <field name="reference_out_ids" widget="many2many_tags" invisible="1"/>
+            </xpath>
+            <xpath expr="//field[@name='reference_out_ids']" position="after">
+                <field name="reference_in_id" widget="many2many_tags"
+                       attrs="{'readonly': [('state', '=', 'purchase')]}"
+                       domain="[('id', 'in', reference_in_ids)]"
+                       options="{'no_create': True, 'no_create_edit':True}"/>
+            </xpath>
+            <xpath expr="//field[@name='reference_in_id']" position="after">
+                <field name="reference_in_ids" widget="many2many_tags" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_stock_picking_form_inherited" model="ir.ui.view">
+        <field name="name">stock.picking.form.inherited</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='location_id']" position="replace">
+                <field name="location_id" domain="[('id', 'in', location_ids)]" attrs="{'invisible': [('picking_type_code', '=', 'incoming')]}"/>
+            </xpath>
+            <xpath expr="//field[@name='location_id']" position="after">
+                <field name="location_ids" invisible="1"/>
+            </xpath>
+            <xpath expr="//page[4]/group[1]/group[1]/field[@name='company_id']" position="after">
+                <field name="export_in_name"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
