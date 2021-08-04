@@ -1,0 +1,41 @@
+<odoo>
+
+    <record id="view_product_template_form_inherit" model="ir.ui.view">
+        <field name="name">product.template.inherit</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_form_view"/>
+        <field name="arch" type="xml">
+            <field name="company_id" position="after">
+                <field name="input_url" widget="url" placeholder="URL"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_product_template_tree_inherit" model="ir.ui.view">
+        <field name="name">product.template.tree.inherit</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_tree_view"/>
+        <field name="arch" type="xml">
+            <field name="default_code" position="after">
+                <field name="input_url" widget="url" placeholder="URL"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_product_template_kanban_inherit" model="ir.ui.view">
+        <field name="name">product.template.inherit</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_kanban_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[1]/div[2]" position="after">
+                <div class="oe_left">
+                    <a type="field">
+                        <field name="input_url" widget="url" placeholder="URL" text="URL"
+                        attrs="{'invisible': [('input_url', '=', False)]}"/>
+                    </a>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
