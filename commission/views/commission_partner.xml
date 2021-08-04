@@ -1,0 +1,77 @@
+<odoo>
+    <data>
+        <record model="ir.ui.view" id="inherit_independent_partner_extra_price">
+            <field name="name">independent partner extra price</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='vat']" position="after">
+                    <field name="independent_partner" />
+                    <!-- <field name="wealth_manager" /> -->
+                </xpath>
+            </field>
+        </record>
+
+
+        <!-- <record id="inherit_users_commission"  model="ir.ui.view">
+            <field name="name">users commission</field>
+            <field name="model">res.users</field>
+            <field name="inherit_id" ref="base.view_users_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='tz']" position="after">
+                    <field name="commission_price" />
+                </xpath>
+            </field>
+        </record> -->
+
+
+
+        <record id="inherit_employee_commission"  model="ir.ui.view">
+            <field name="name">employee commission</field>
+            <field name="model">hr.employee</field>
+            <field name="inherit_id" ref="hr.view_employee_form"/>
+            <field name="arch" type="xml">
+                 
+                <xpath expr="//div[@name='button_box']" position="inside">
+                    <button class="oe_stat_button" name="view_emp_journal_entry"
+                            icon="fa-money"
+                            type="object">
+                        <field string="Commission" name="total_commission" widget="statinfo"/>
+                    </button>
+                </xpath> 
+                 
+                 
+                 
+                 
+                <xpath expr="//page[@name='public']/div/div[@id = 'o_work_employee_main']/group[1]" position="before">
+                    <group name="emp_commission">
+                        <group>
+                            <field name="commission_price" />
+                        </group>
+                    </group>
+                </xpath>
+            </field>
+        </record>
+
+
+
+        <record id="inherit_sale_order_partner_commission"  model="ir.ui.view">
+            <field name="name">Sale order partner commission</field>
+            <field name="model">sale.order</field>
+            <!-- <field name="inherit_id" ref="sale.view_order_form"/> -->
+             <field name="inherit_id" ref="sale_management.sale_order_form_quote"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='sale_order_template_id']" position="after">
+                    <field name="referred_by"  attrs="{'readonly': [('state', 'not in', ('draft'))]}"/>
+                    <field name="commission_for" domain="['|',('commission_price','!=',False),('commission_price','!=',0.00)]" attrs="{'readonly': [('state', 'not in', ('draft'))]}"  options="{'no_quick_create': True, 'no_create_edit' : True,}"/>
+                </xpath>
+                <!-- <xpath expr="//field[@name='partner_id']" position="after">
+                    <field name="referred_by"  attrs="{'readonly': [('state', 'not in', ('draft'))]}"/>
+                </xpath>
+                 <xpath expr="//field[@name='user_id']" position="before">
+                    <field name="commission_for" domain="['|',('commission_price','!=',False),('commission_price','!=',0.00)]" attrs="{'readonly': [('state', 'not in', ('draft'))]}"  options="{'no_quick_create': True, 'no_create_edit' : True,}"/>
+                </xpath> -->
+            </field>
+        </record>
+    </data>
+</odoo>    
