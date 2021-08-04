@@ -25,7 +25,7 @@ class CommissionEmployee(models.Model):
             amount = 0.0
             enteries = rec.env['account.move'].search([('commission_partner_id','=',rec.id),('move_type','=','entry')])  
             for record in enteries:
-                amount= amount + record.amount_total_signed
+                amount= amount + record.commission_payable_total
             rec.total_commission =amount
                 
     def view_emp_journal_entry(self):
@@ -52,7 +52,7 @@ class CommissionEmployee(models.Model):
                 'domain': [('commission_partner_id', '=', self.id),('journal_id.type','=','general')],
                 'res_model': 'account.move',
 #                 'view_mode' : 'tree',
-                 'views': [[False, 'tree']],
+                 'views': [[False, 'tree'],[False, 'form']],
             }
  
             return custom_action

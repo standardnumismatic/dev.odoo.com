@@ -2,6 +2,7 @@ from odoo import models, fields, api,_
 from datetime import datetime
 from odoo.exceptions import ValidationError , UserError
 import json
+# from odoo.tools.float_utils import stop
 
 
 # 
@@ -105,11 +106,43 @@ class AccountMoveCommissionInh(models.Model):
     journal_entry_count = fields.Integer(string = "Journal Entry",compute="get_total_enteries")
     referred_by = fields.Many2one('res.partner',string="Referred by", domain =[('independent_partner','=',True)])
     invoice_ref = fields .Many2one('account.move', string="Invoice Ref")
-    commission_partner_id = fields.Many2one("hr.employee", string="Commission for",required = True)     
-
+    commission_partner_id = fields.Many2one("hr.employee", string="Commission for") 
+    
+    commission_payable_total = fields.Monetary(string='Commission Payable Total', compute='compute_commission_amount', currency_field='company_currency_id' ) 
+    
+    
+    @api.depends(
+    
+        'line_ids.debit',
+        'line_ids.credit',
+        )
+    def compute_commission_amount(self):
+        for rec in self:
+            payable_total = 0.0
+            if rec.move_type == 'entry':
+                com_payable_acc = self.env['account.account'].search([('name','=','Commission payable')])
+               
+                line_comm_payable = rec.line_ids.filtered(lambda q ,r = com_payable_acc : q.account_id.id == r.id)
+                if line_comm_payable:
+                    if line_comm_payable.debit > 0.0:
+                        payable_total = line_comm_payable.debit
+                        rec.commission_payable_total = -1 * payable_total    
+                    elif line_comm_payable.credit > 0.0:
+                        payable_total = line_comm_payable.credit  
+                        rec.commission_payable_total =  payable_total       
+                else:    
+                    rec.commission_payable_total = payable_total    
+          
+            else:    
+                rec.commission_payable_total = payable_total    
+            
+            return payable_total
+            
     def action_post(self):
         res = super(AccountMoveCommissionInh,self).action_post()
         gen_entries =self.search([('ref','=',self.invoice_origin),('move_type','=','entry')])
+        bank_entry = gen_entries.filtered(lambda q : q.journal_id.name =='Bank')
+        self.payment_reference = bank_entry.name
         if gen_entries:
             for rec in gen_entries:
                 rec.invoice_ref = self
@@ -120,9 +153,12 @@ class AccountMoveCommissionInh(models.Model):
 
     def get_total_enteries(self):
         for rec in self:
-            #             if rec.state == 'posted':
+           
             if rec.invoice_origin:
-                enteries = rec.env['account.move'].search([('ref','=',rec.invoice_origin),('move_type','=','entry')])
+                if rec.state == 'posted':
+                    enteries = rec.env['account.move'].search([('invoice_ref','=',rec.id),('move_type','=','entry')])
+                elif rec.state == 'draft':
+                    enteries = rec.env['account.move'].search([('ref','=',rec.invoice_origin),('move_type','=','entry')])
                 rec.journal_entry_count = len(enteries)
             else:
                 rec.journal_entry_count = 0
@@ -135,12 +171,13 @@ class AccountMoveCommissionInh(models.Model):
         #             action['context'] = {'create' : 0}
         #             return action
         if self.invoice_origin != False:
+            domain = [('invoice_ref', '=', self.id)] if self.state == 'posted' else [('ref','=',self.invoice_origin)]
             return {
                 'type': 'ir.actions.act_window',
                 'name': 'Commission journal Entry',
                 'view_id': self.env.ref('account.action_move_journal_line', False).id,
                 'target': 'current',
-                'domain': [('ref', '=', self.invoice_origin)],
+                'domain': domain,
                 'res_model': 'account.move',
                 'views': [[False, 'tree'], [False, 'form']],
             }
@@ -269,6 +306,42 @@ class AccountMoveCommissionInh(models.Model):
 # 
 #         return res
         
+class AccountMoveReversalCommisssionInh(models.TransientModel):
+    _inherit = 'account.move.reversal'
+
+    def reverse_moves(self):
+
+        if self.move_ids.invoice_ref:
+            commission_entries = self.env['account.move'].search([('invoice_ref','=',self.move_ids.invoice_ref.id)])
+            if commission_entries:
+                self.move_ids = commission_entries
+               
+        res = super(AccountMoveReversalCommisssionInh , self).reverse_moves()
+        return res
         
+        
+    def _prepare_default_reversal(self, move):
+        res = super(AccountMoveReversalCommisssionInh , self)._prepare_default_reversal(move)
+        
+        if move.journal_id.type == 'general':
+            res['journal_id'] =  move.journal_id.id
+            
+        return res
+    
+        
+    
+    @api.model
+    def default_get(self, fields):
+        res = super(AccountMoveReversalCommisssionInh, self).default_get(fields)
+        move_ids = self.env['account.move'].browse(self.env.context['active_ids']) if self.env.context.get('active_model') == 'account.move' else self.env['account.move']
+        if 'journal_id' in fields:
+            res['journal_id'] = move_ids.journal_id.id 
+       
+        return res    
+    
+        
+ 
+    
+    
         
         
