@@ -43,6 +43,9 @@ class AdvancePayments(models.TransientModel):
                 }
             payment = self.env['account.payment'].create(vals)
             payment.action_post()
+            if record.invoice_ids:
+                record.invoice_ids.payment_reference = payment.name
+                payment.move_id.invoice_ref =  record.invoice_ids[0]
             record.is_show_payment = True
 #             commission = record.user_id.commission_price
             if record.commission_for and record.commission_for.commission_price: 
@@ -103,6 +106,9 @@ class AdvancePayments(models.TransientModel):
         journal_entry_dict['line_ids'] = move_lines
         journal_entry_id = self.env['account.move'].create(journal_entry_dict)
         journal_entry_id.action_post()
+        if rec.invoice_ids:
+            journal_entry_id.invoice_ref = rec.invoice_ids[0]
+            
         #extra journal entry (extra price  - unit price)based on string
         if inde_part:
             ip_move_lines=[]

@@ -152,3 +152,15 @@ class AccountPaymentInhs(models.Model):
 
     user_id = fields.Many2one('res.users', string='Sales Person')
     memo = fields.Char(string='Memo')
+    reverse_move_id = fields.Many2one('account.move', string="Reverse Entry", compute="get_reverse_entry_id")
+    is_entry_reversed =  fields.Boolean("Is Entry Reversed" ,default= False ,compute="get_reverse_entry_id")
+    
+    def get_reverse_entry_id(self):
+        for rec in self:
+            if rec.reversal_move_id:
+                rec.reverse_move_id = rec.reversal_move_id.id
+                rec.is_entry_reversed = True
+            else:    
+                rec.reverse_move_id = False
+                rec.is_entry_reversed = False
+    
