@@ -1,0 +1,152 @@
+<odoo>
+
+    <record id="view_purchase_order_form_inherit" model="ir.ui.view">
+        <field name="name">purchase.order.form.inherit</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//field[@name='order_line']" position="attributes">
+                <attribute name="attrs">{'readonly': [('state', '!=', 'draft')]}</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='date_planned']" position="attributes">
+                <attribute name="attrs">{'readonly': [('state', '!=', 'draft')]}</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='user_id']" position="attributes">
+                <attribute name="attrs">{'readonly': [('state', '!=', 'draft')]}</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='company_id']" position="attributes">
+                <attribute name="attrs">{'readonly': [('state', '!=', 'draft')]}</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='reminder_date_before_receipt']" position="attributes">
+                <attribute name="attrs">{'readonly': [('state', '!=', 'draft')]}</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='partner_id']" position="attributes">
+                <attribute name="attrs">{'readonly': [('state', '!=', 'draft')]}</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='currency_id']" position="attributes">
+                <attribute name="attrs">{'readonly': [('state', '!=', 'draft')]}</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='date_order']" position="attributes">
+                <attribute name="attrs">{'readonly': [('state', '!=', 'draft')]}</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='receipt_reminder_email']" position="attributes">
+                <attribute name="attrs">{'readonly': [('state', '!=', 'draft')]}</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='fiscal_position_id']" position="attributes">
+                <attribute name="attrs">{'readonly': ['|', ('invoice_status','=', 'invoiced'), ('state', '!=', 'draft')]}</attribute>
+            </xpath>
+
+            <xpath expr="//header/button[@name='action_rfq_send']" position="after">
+                 <button name="hos_button_approved"
+                         type="object"
+                         string="Approve"
+                         class="oe_highlight"
+                         attrs="{'invisible': [('state', '!=', 'hos_approve')]}"
+                         groups="purchase_approved_limits.group_hos_approval"/>
+            </xpath>
+
+            <xpath expr="//header/button[@name='action_rfq_send']" position="after">
+                 <button name="md_button_approved"
+                         type="object"
+                         string="Approve"
+                         class="oe_highlight"
+                         attrs="{'invisible': [('state', '!=', 'md_approve')]}"
+                         groups="purchase_approved_limits.group_md_approval"/>
+            </xpath>
+
+            <xpath expr="//header//button[@name='button_confirm']" position="after">
+                 <button name="hos_button_reject"
+                         type="object"
+                         string="Reject"
+                         class="oe_highlight"
+                         attrs="{'invisible': [('state', '!=', 'hos_approve')]}"
+                         groups="purchase_approved_limits.group_hos_approval"/>
+            </xpath>
+
+            <xpath expr="//header//button[@name='button_confirm']" position="after">
+                 <button name="md_button_reject"
+                         type="object"
+                         string="Reject"
+                         class="oe_highlight"
+                         attrs="{'invisible': [('state', '!=', 'md_approve')]}"
+                         groups="purchase_approved_limits.group_md_approval"/>
+            </xpath>
+
+            <xpath expr="//header/button[@name='button_draft']" position="attributes">
+                <attribute name="attrs">{'invisible': [('state', 'not in', ['reject','cancel'])]}</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='payment_term_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+            <xpath expr="//sheet/group[1]/group[2]/div[@name='reminder']" position="after">
+                <field name="payment_term_id"
+                       attrs="{'readonly': ['|', '|', ('invoice_status','=', 'invoiced'), ('state', '=', 'done'), ('is_receipt_done', '!=', False)]}"
+                       options="{'no_create': True}"/>
+
+                <field name="carriage_method"
+                       attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+
+                <field name="is_receipt_done" invisible="1"/>
+            </xpath>
+
+            <xpath expr="//sheet/group[1]/group[1]/field[@name='currency_id']" position="after">
+                <field name="picking_type_id"
+                       domain="[('code','=','incoming'), '|', ('warehouse_id', '=', False), ('warehouse_id.company_id', '=', company_id)]"
+                       options="{'no_create': True}"
+                       groups="stock.group_stock_multi_locations"/>
+                <field name="warehouse_id"
+                       options="{'no_create': True}"
+                       groups="stock.group_stock_multi_warehouses" force_save="1"/>
+            </xpath>
+
+        </field>
+    </record>
+
+    <record id="view_stock_picking_form_inh" model="ir.ui.view">
+        <field name="name">stock.picking.form.inh</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet/group[1]/group[1]/field[@name='location_dest_id']" position="replace">
+                <field name="location_dest_id"
+                       options="{'no_create': True}"
+                       groups="stock.group_stock_multi_locations"
+                       domain="[('id', 'in', warehouse_domain_id)]"
+                       attrs="{'invisible': [('picking_type_code', '=', 'outgoing')], 'readonly': [('state', 'in', ['done', 'ceo_approve'])]}"/>
+            </xpath>
+            <xpath expr="//field[@name='location_dest_id']" position="after">
+                <field name="warehouse_domain_id" widget="many2many_tags" invisible="1"/>
+            </xpath>
+            <xpath expr="//field[@name='origin']" position="attributes">
+                <attribute name="attrs">{'readonly': [('state', '!=', 'draft')]}</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_account_move_form_inherit" model="ir.ui.view">
+        <field name="name">account.move.form.inherit</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet/group[1]/group[2]" position="after">
+                <group>
+                    <field name="payment_term_id" attrs="{'readonly': [('invoice_origin', '!=', False)]}"/>
+                    <field name="carriage_method" attrs="{'readonly': [('invoice_origin', '!=', False)]}"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
