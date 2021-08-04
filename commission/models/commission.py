@@ -71,7 +71,7 @@ class SaleOrderExtraPriceCommission(models.Model):
         self.price_unit = pre_price
 
 
-    #
+    
     #     @api.onchange('product_id')
     #     def product_id_change(self):
     #         super(SaleOrderExtraPriceCommission , self).product_id_change()
@@ -340,6 +340,12 @@ class AccountMoveReversalCommisssionInh(models.TransientModel):
         return res    
     
         
+ 
+class StockTracking(models.Model):
+    _inherit = "stock.picking" 
+    
+    comm_tracking_no = fields.Char(string ="Tracking no")
+    
  
     
     

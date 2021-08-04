@@ -64,7 +64,7 @@ class CommissionEmployee(models.Model):
     
 class CommissionSaleEmployee(models.Model):
     _inherit = "sale.order" 
-    commission_for = fields.Many2one("hr.employee", string="Commission for",required = True)        
+    commission_for = fields.Many2one("hr.employee", string="Commission for")        
     
 #     @api.model
 #     def create(self, vals):

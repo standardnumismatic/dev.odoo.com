@@ -80,14 +80,36 @@
                     <field name="journal_id"/>
                     <field name="invoice_ref"/>
                     <field name="commission_partner_id"/>
-                    <field name = "commission_payable_total" sum="total of commission payable" />
-                    <field name="amount_total_signed" sum="Total Amount" string="Total" decoration-bf="1"/>
+                    <!-- <field name = "commission_payable_total" sum="total of commission payable" />
+                    <field name="amount_total_signed" sum="Total Amount" string="Total" decoration-bf="1"/> -->
+                    
+                    <field name = "commission_payable_total" />
+                    <field name="amount_total_signed" string="Total" decoration-bf="1"/>
                     <field name="state" widget="badge" decoration-info="state == 'draft'" decoration-success="state == 'posted'"/>
                    
                 </tree>
             </field>
         </record>
          
+        
+        
+        
+        <record id="view_stock_picking_form_commission_inherit" model="ir.ui.view">
+            <field name="name">stock.picking.form.commission.inherit</field>
+            <field name="model">stock.picking</field>
+            <field name="inherit_id" ref="stock.view_picking_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='origin']" position="after">
+                    <field name="comm_tracking_no" placeholder=""
+                           attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                    
+                </xpath>
+            </field>
+       </record>
+
+        
+        
+        
          
          
          <!-- <record id="action_commission_emp_journal_entry_type" model="ir.actions.act_window">
