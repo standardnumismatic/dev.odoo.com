@@ -83,7 +83,7 @@
                     <!-- <field name = "commission_payable_total" sum="total of commission payable" />
                     <field name="amount_total_signed" sum="Total Amount" string="Total" decoration-bf="1"/> -->
                     
-                    <field name = "commission_payable_total" />
+                    <field name = "commission_payable_total" sum="total of commission payable"/>
                     <field name="amount_total_signed" string="Total" decoration-bf="1"/>
                     <field name="state" widget="badge" decoration-info="state == 'draft'" decoration-success="state == 'posted'"/>
                    
