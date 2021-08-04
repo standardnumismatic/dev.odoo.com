@@ -1,0 +1,149 @@
+<odoo>
+
+    <record id="status_from_cron_scheduler_action_unreserve_qty" model="ir.cron">
+        <field name="name">Activity Scheduler</field>
+        <field name="user_id" ref="base.user_root"/>
+        <field name="model_id" ref="model_sale_order" />
+        <field name="state">code</field>
+        <field name="active">1</field>
+        <field name="code">model.action_change_state()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="numbercall">-1</field>
+    </record>
+    
+     <record id="view_sale_stock_order_inherit" model="ir.ui.view">
+        <field name="name">sale.order.inherit.stock</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale_stock.view_order_form_inherit_sale_stock"/>
+        <field name="arch" type="xml"> 
+            <xpath expr="//field[@name='warehouse_id']" position="replace">
+            </xpath>
+        </field>
+    </record>    
+
+    <record id="view_sale_order_inherit" model="ir.ui.view">
+        <field name="name">sale.order.inherit</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+              
+             <xpath expr="//field[@name='payment_term_id']" position="after">
+                 <field name="warehouse_id" options="{'no_create': True}" groups="stock.group_stock_multi_warehouses" force_save="1"/>
+            </xpath>  
+              
+              
+            <xpath expr="//button[@name='action_draft']" position="after">
+                <button string="Register Payment" type="object" name="action_register_payments" class="oe_highlight" attrs="{'invisible': ['|', ('state', '!=', 'sale'), ('is_show_payment', '!=', False)]}"/>
+            </xpath>
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button class="oe_stat_button" icon="fa-dollar"  type="object" name="action_show_payments" attrs="{'invisible': [('state', '!=', 'sale')]}">
+                    <field name="payment_count" string="Payments" widget="statinfo"/>
+                </button>
+            </xpath>
+            <xpath expr="//header/button[4]" position="attributes">
+                <attribute name="invisible">0</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='order_line']" position="attributes">
+                <attribute name="attrs">{'readonly': [('state', 'in', ('done','cancel','sale'))]}</attribute>
+            </xpath>
+
+             <xpath expr="//field[@name='payment_term_id']" position="after">
+                 <field name="expiry_date" attrs="{'invisible':['|',('state','!=', 'sale'), ('is_show_payment', '!=', False)]}" readonly="1"/>
+                 <field name="rem_days" attrs="{'invisible':['|',('state','!=', 'sale'), ('is_show_payment', '!=', False)]}" readonly="1"/>
+                 <field name="is_show_payment" invisible="1"/>
+<!--                 <field name="is_show_create_invoice" invisible="1"/>-->
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_stock_picking_inherit" model="ir.ui.view">
+        <field name="name">stock.picking.inherit</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet/group[1]/group[1]/field[@name='location_id']" position="replace">
+                <field name="location_id" options="{'no_create': True}"
+                       groups="stock.group_stock_multi_locations"
+                       attrs="{'invisible': [('picking_type_code', '=', 'incoming')], 'readonly': [('state', 'not in', ['draft','confirmed','assigned'])]}"
+                       domain="[('id', 'in', warehouse_domain_id)]" />
+
+                <field name="warehouse_domain_id" widget="many2many_tags" invisible="1"/>
+            </xpath>
+
+            <xpath expr="//header/button[@name='button_validate']" position="attributes">
+                <attribute name="attrs">{'invisible': ['|', '|',('state', 'in', ('waiting','confirmed')), ('show_validate', '=', False), ('is_show_validate', '!=', True)]}</attribute>
+            </xpath>
+            <xpath expr="//header/button[@name='action_assign']" position="attributes">
+                <attribute name="attrs">{'invisible': ['|', ('show_check_availability', '=', False), ('is_show_validate', '!=', True)]}</attribute>
+            </xpath>
+
+            <xpath expr="//header/button[@name='action_toggle_is_locked']" position="attributes">
+                <attribute name="attrs">{'invisible': ['|', ('state', 'in', ('draft', 'assigned','cancel', 'done')), ('is_locked', '=', False)]}</attribute>
+            </xpath>
+
+            <xpath expr="//header/button[@name='%(stock.action_report_delivery)d']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+            <xpath expr="//header/button[4]" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='origin']" position="after">
+                 <field name="expiry_date" readonly="1" attrs="{'invisible':['|',('state','not in', ['confirmed','assigned']),('is_show_validate', '!=', False)]}"/>
+                 <field name="rem_days" readonly="1" attrs="{'invisible':['|',('state','in', ['draft','done','confirmed']),('is_show_validate', '!=', False)]}"/>
+                 <field name="is_show_validate" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_account_move_inherit" model="ir.ui.view">
+        <field name="name">account.move.inherit</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header/button[@name='button_draft']" position="attributes">
+                <attribute name="attrs">{'invisible': ['|', ('show_reset_to_draft_button', '=', False), ('invoice_origin','!=', False)]}</attribute>
+            </xpath>
+            <xpath expr="//header/button[@name='action_register_payment']" position="attributes">
+                <attribute name="attrs">{'invisible': ['|', '|', '|',('invoice_origin','!=', False), ('state', '!=', 'posted'), ('payment_state', 'not in', ('not_paid', 'partial')), ('move_type', 'not in', ('out_invoice', 'out_refund', 'in_invoice', 'in_refund', 'out_receipt', 'in_receipt'))]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='edi_state']" position="after">
+                 <field name="expiry_date" readonly="1" attrs="{'invisible':['|', ('state','in', ['posted','cancel']), ('is_check_payment_registered','!=', False)]}"/>
+                 <field name="rem_days" readonly="1" attrs="{'invisible':['|', ('state','in', ['posted','cancel']), ('is_check_payment_registered','!=', False)]}"/>
+                <field name="is_check_payment_registered" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="account_payment_form_inh">
+        <field name="name">account.payment.form.inh</field>
+        <field name="model">account.payment</field>
+        <field name="inherit_id" ref="account.view_account_payment_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='ref']" position="after">
+                <field name="user_id"/>
+            </xpath>
+            <xpath expr="//field[@name='move_id']" position="after">
+                <field name="memo"/>
+                <field name="reverse_move_id" attrs="{'invisible': [('is_entry_reversed', '=', False)]}"/>
+                <field name="is_entry_reversed" invisible ="1"/>
+            </xpath>
+            <xpath expr="//field[@name='destination_account_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='is_internal_transfer']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='company_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='ref']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
