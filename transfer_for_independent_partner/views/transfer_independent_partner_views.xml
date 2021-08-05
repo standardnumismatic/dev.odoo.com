@@ -21,7 +21,7 @@
                 <field name="date_deadlines" placeholder="Transfer for Independent Partners"
                        attrs="{'invisible': [('is_internal', '!=', True)], 'readonly': [('state', '!=', 'draft')]}"/>
                 <field name="is_internal" invisible="1"/>
-                <field name="check_internal"/>
+                <field name="check_internal" invisible="1"/>
             </xpath>
         </field>
     </record>
