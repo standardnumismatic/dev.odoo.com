@@ -345,9 +345,22 @@ class StockTracking(models.Model):
     _inherit = "stock.picking" 
     
     comm_tracking_no = fields.Char(string ="Tracking no")
+    do_tracking = fields.Boolean('Operation delivery', default = False , compute ='tracking_visibility')
     
- 
+    @api.depends('picking_type_id')
+    def tracking_visibility(self):
+        for rec in self:
+            if rec.picking_type_id.code == 'outgoing': 
+                rec.do_tracking = True
+            else:
+                rec.do_tracking = False
     
-    
-        
-        
+#     @api.onchange('picking_type_id')
+#     def tracking_fields_visibilty(self):
+#         self.update({'do_tracking': False})
+#         if self.picking_type_id:
+#             if (self.picking_type_id.code == 'outgoing'):
+#                 self.update({'do_tracking': True})
+#             elif (self.picking_type_id.code != 'outgoing'):
+#                 self.update({'do_tracking': False})    
+#         
