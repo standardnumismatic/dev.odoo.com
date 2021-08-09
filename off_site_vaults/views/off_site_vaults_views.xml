@@ -34,7 +34,7 @@
                         groups="off_site_vaults.group_ceo_approval"/>
             </xpath>
 
-            <xpath expr="//header//button[@name='action_assign']" position="after">
+            <xpath expr="//header//button[@name='ceo_button_approved']" position="after">
                 <button name="ceo_button_reject"
                         type="object"
                         string="Reject"
