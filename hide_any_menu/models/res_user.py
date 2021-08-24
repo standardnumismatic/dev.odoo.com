@@ -92,8 +92,8 @@ class FieldConfiguration(models.Model):
     _name = 'field.configuration'
     _description = 'Field Configuration'
 
-    model_id = fields.Many2one('ir.model', string='Model', required=True)
-    field_id = fields.Many2one('ir.model.fields', string='Field', required=True)
+    model_id = fields.Many2one('ir.model', string='Model', required=True, ondelete='cascade')
+    field_id = fields.Many2one('ir.model.fields', string='Field', required=True, ondelete='cascade')
     field_name = fields.Char(related='field_id.name', string='Technical Name', readonly=True)
     group_ids = fields.Many2many('res.groups', 'field_config_group_rel', 'group_id', 'field_config_id', required=True, string='Groups')
     readonly = fields.Boolean('ReadOnly', default=False)
