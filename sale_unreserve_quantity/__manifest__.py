@@ -24,7 +24,7 @@
     'data': [
         'wizards/advance_payment_wizard.xml',
         'security/ir.model.access.csv',
-        'reports/report_templates.xml',
+        # 'reports/report_templates.xml',
         'views/sale_unreserve_quantity_views.xml',
     ],
 
