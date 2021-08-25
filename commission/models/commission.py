@@ -3,9 +3,24 @@ from datetime import datetime
 from odoo.exceptions import ValidationError , UserError
 import json
 # from odoo.tools.float_utils import stop
-
-
+# import struct
+# from odoo.http import request
+# from odoo.tools import date_utils
+# from urllib.parse import unquote
+# from urllib import parse
+# import csv
 # 
+# 
+# with open('/home/erum/mycontactfile.csv') as csv_file:
+#     csv_reader = csv.reader(csv_file)
+#     for line in  csv_reader:
+#         print(line)
+#     csv_file.close()     
+    
+    
+    
+    
+    
 class SaleOrderPartnerCommission(models.Model):
     _inherit = "sale.order"
 
@@ -69,7 +84,16 @@ class SaleOrderExtraPriceCommission(models.Model):
             pre_price = self.price_unit
         super(SaleOrderExtraPriceCommission,self).product_uom_change()
         self.price_unit = pre_price
-
+        
+#         with_open('/home/erum/mycontactfile.csv'):
+#             csv_reader = csv.reader(csf)
+#         
+#         url= json.loads(data['data'])[0]
+#         url_readable= unquote(url)
+#         p=parse.urlsplit(url)
+#         url_data= parse.parse_qs(parse.urlsplit(url).query)
+#         data_dict= json.loads(url_data['options'][0]) 
+        
 
     
     #     @api.onchange('product_id')
@@ -344,8 +368,23 @@ class AccountMoveReversalCommisssionInh(models.TransientModel):
 class StockTracking(models.Model):
     _inherit = "stock.picking" 
     
-    comm_tracking_no = fields.Char(string ="Tracking no")
-    do_tracking = fields.Boolean('Operation delivery', default = False , compute ='tracking_visibility')
+    
+    @api.model
+    def default_get(self, default_fields):
+        res= super(StockTracking , self).default_get(default_fields)
+        if self.picking_type_id:
+            if self.picking_type_id.code == 'outgoing':
+                if 'do_tracking' in res:
+                    res['do_tracking'] =True
+                else:
+                    res['do_tracking'] =True
+                    
+        return res
+
+    
+    
+    comm_tracking_no = fields.Char(string ="Tracking Id")
+    do_tracking = fields.Boolean('Operation delivery', compute ='tracking_visibility')
     
     @api.depends('picking_type_id')
     def tracking_visibility(self):
