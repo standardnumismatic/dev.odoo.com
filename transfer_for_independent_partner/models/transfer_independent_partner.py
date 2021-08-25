@@ -25,14 +25,18 @@ class StockPickingInhs(models.Model):
             self.is_internal = False
 
     def action_transfer_independent(self):
+        quant_in = 0
+        a = 0
+        quant_out = 0
+        b = 0
         print('working')
         picking_record = self.search([])
+        # print(picking_record)
         for record in picking_record:
             if record.picking_type_id.sequence_code == 'INT':
                 if record.date_deadlines:
                     if record.state == 'done' and record.date_deadlines <= datetime.now() and record.check_internal == False:
                         rec = self.env['stock.picking'].create({
-                            'check_internal': True,
                             'partner_id': record.partner_id.id,
                             'picking_type_id': record.picking_type_id.id,
                             'location_id': record.location_dest_id.id,
@@ -40,17 +44,34 @@ class StockPickingInhs(models.Model):
                             'origin': record.name,
                         })
                         for line in record.move_line_ids_without_package:
-                            location_record = self.env['stock.quant'].search([('product_id', '=', line.product_id.id), ('location_id', '=', line.location_dest_id.id), ('lot_id', '=', line.lot_id.id)])
-                            line1 = self.env['stock.move.line'].create({
-                                'product_id': line.product_id.id,
-                                'lot_id': line.lot_id.id,
-                                'product_uom_qty': location_record.available_quantity,
-                                'product_uom_id': line.product_id.uom_id.id,
-                                'location_id': record.location_dest_id.id,
-                                'location_dest_id': record.location_id.id,
-                                'qty_done': location_record.available_quantity,
-                                'picking_id': rec.id,
-                            })
+                            # location_record = self.env['stock.quant'].search([('product_id', '=', line.product_id.id), ('location_id', '=', line.location_dest_id.id)])
+                            move_record = self.env['stock.move.line'].search([('product_id', '=', line.product_id.id), ('location_id', '=', line.location_id.id), ('location_dest_id', '=', line.location_dest_id.id), ('lot_id', '=', line.lot_id.id)])
+                            for move in move_record:
+                                if record.create_date < move.date:
+                                    a = a + move.qty_done
+                                    move.picking_id.check_internal = True
+                            quant_in = a
+                            print(quant_in)
+                            move_recs = self.env['stock.move.line'].search([('product_id', '=', line.product_id.id), ('location_id', '=', line.location_dest_id.id), ('lot_id', '=', line.lot_id.id)])
+                            for moves in move_recs:
+                                if record.create_date < moves.date:
+                                    b= b + moves.qty_done
+                            quant_out = b
+                            print(quant_out)
+                            total_qty = quant_in - quant_out
+                            if total_qty > 0:
+                                line1 = self.env['stock.move.line'].create({
+                                    'product_id': move_record.product_id.id,
+                                    'lot_id': move_record.lot_id.id,
+                                    # 'product_uom_qty': move_record.qty_done,
+                                    'product_uom_qty': total_qty,
+                                    'product_uom_id': move_record.product_id.uom_id.id,
+                                    'location_id': move_record.location_dest_id.id,
+                                    'location_dest_id': move_record.location_id.id,
+                                    # 'qty_done': move_record.qty_done,
+                                    'qty_done': total_qty,
+                                    'picking_id': rec.id,
+                                })
                         print(rec)
                         rec.action_confirm()
                         rec.action_assign()
